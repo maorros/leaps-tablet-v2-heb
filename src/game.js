@@ -13,6 +13,27 @@ const RED_METRICS_HOST = "api.creativeforagingtask.com";
 const RED_METRICS_GAME_VERSION = "0b0986f3-9119-4d90-82fb-20ee4842da69";
 
 
+const TRIGGERS = {
+  "loadGame": 100, // When loads starts
+  "startGame": 3, // When pressing the button "let's play" - (A "start game" trigger)
+  "collectShape": 4, // EVENT - Every time the player presses the "collect shape" button (either in the tutorial or in game time)
+  "endGame": 5, // When a player presses the "end game" button- (An "end game" trigger)
+  "chooseGalleryShape": 6, // EVENT - Every time a choice of a gallery shape is done (in the "choose the 5 most creative shapes" screen)
+  "galleryDone": 7, // At the gallery screen - When the player presses "all done" (An "end choice" trigger).
+};
+
+
+function sendTrigger(name) {
+  if(!ws || ws.readyState != WebSocket.OPEN) {
+    console.warn("Websocket connection not available. Skipping trigger", name);
+    return;
+  }
+
+  const trigger = TRIGGERS[name];
+  ws.send(trigger.toString());
+}
+
+
 function gridPosToPixelPos(gridPos) {
   return util.multiply(gridPos, BLOCK_WIDTH);
 }
@@ -176,7 +197,11 @@ class TrainingScene extends util.Entity {
     document.getElementById("training-gui").style.display = "block";
     document.getElementById("done-training-1").addEventListener("click", this.onDonePart1.bind(this));
     document.getElementById("done-training-2").addEventListener("click", this.onDonePart2.bind(this));
-    document.getElementById("done-training-4").addEventListener("click", e => this.done = true);
+    document.getElementById("done-training-4").addEventListener("click", e => {
+      this.done = true;
+
+      sendTrigger("startGame");
+    });
   }
 
   update(timeSinceStart) {
@@ -521,6 +546,7 @@ class BlockScene extends util.Entity {
     if(!this.changedShape) return;
     if(this.draggingBlock) return; // Can't add shape while dragging
 
+    sendTrigger("collectShape");
 
     const galleryShape = util.cloneData(this.blockGrid)
     galleryShapes.push(galleryShape);
@@ -556,6 +582,8 @@ class BlockScene extends util.Entity {
   }
 
   confirmDone() {
+    sendTrigger("endGame");
+
     this.done = true;
 
     searchScore = calculateSearchScore()
@@ -656,6 +684,8 @@ class GalleryScene extends util.Entity {
 
     this.updateDoneButton();
 
+    sendTrigger("chooseGalleryShape");
+
     redmetricsConnection.postEvent({
       type: "selected shape",
       customData: {
@@ -681,6 +711,8 @@ class GalleryScene extends util.Entity {
 
   onDoneSelection() {
     const selectedShapes = _.map(this.selectedIndexes, index => convertShapeToArray(galleryShapes[index]));
+
+    sendTrigger("galleryDone");
 
     redmetricsConnection.postEvent({
       type: "done selection",
@@ -827,11 +859,14 @@ redmetricsConnection.connect().then(function() {
 
 // Connect to parallel port via Mister P
 let webSocketScheme = window.location.protocol === "https:" ? "wss" : "ws"; 
-let ws = new WebSocket(`${webSocketScheme}://localhost:53141/`)
+let ws = new WebSocket(`${webSocketScheme}://localhost:53141/`);
 ws.onopen = () => {
   console.log("Connected to Mister P on port 53141");
-  ws.send("0")
-}
+  sendTrigger("loadGame");
+};
+ws.onerror = (error) => {
+  console.error("Error communicating on WebSocket", error);
+};
 
 // Resize
 util.resizeGame(app);
