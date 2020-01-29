@@ -825,6 +825,14 @@ redmetricsConnection.connect().then(function() {
   console.log("Connected to the RedMetrics server");
 });
 
+// Connect to parallel port via Mister P
+let webSocketScheme = window.location.protocol === "https:" ? "wss" : "ws"; 
+let ws = new WebSocket(`${webSocketScheme}://localhost:53141/`)
+ws.onopen = () => {
+  console.log("Connected to Mister P on port 53141");
+  ws.send("0")
+}
+
 // Resize
 util.resizeGame(app);
 window.addEventListener("resize", () => util.resizeGame(app));
