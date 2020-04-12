@@ -213,7 +213,13 @@ a {
 #end-early-message {
   text-align: right;
   margin-right: 10px;
-  margin-top: 450px;
+  margin-top: 420px;
+  color: orange;
+}
+
+#name-given-message {
+  text-align: center;
+  margin-top: 420px;
   color: orange;
 }
 

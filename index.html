@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -20,7 +20,9 @@
             <p>To continue, please enter the unique ID given to you.</p>
             <br>
             <p><input id="user-provided-id"></p>
-            <br><button id="done-intro">Continue</button></p>
+            <p>Enter name. </p>
+            <p><input id="user-provided-name"></p>
+            <br><button id="done-intro">Continue!!!</button></p>
           </div>
           <div id="training-gui">
             <h1>Training Session</h1>
@@ -68,9 +70,9 @@
           <div id="blocks-gui">
             <button id="add-shape">Collect Shape</button>
             <br><button id="done-adding">End Game</button>
-
+            <p id="name-given-message" class="hidden">ABBA</p>
             <p id="end-early-message" class="hidden">You need to collect at least 5 shapes to move to the next step</p>
-
+		
             <p id="stuck-message" class="vertical-align hidden">Ooops, time has run out!
               <br>You need to collect at least 5 shapes to continue. 
               <br>

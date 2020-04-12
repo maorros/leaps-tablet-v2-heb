@@ -79,10 +79,7 @@ function watchFiles() {
   gulp.watch(['images/*', 'deps/*', '*.css'], copyBuildAssets);
 };
 exports.watchFiles = watchFiles;
-
-
 // Meta-tasks
-
 const build = gulp.series(clean, gulp.parallel([bundle, writeHtml, copyBuildAssets]));
 exports.build = build;
 
