@@ -288,7 +288,7 @@ class BlockScene extends util.Entity {
 
     // HTML
     document.getElementById("blocks-gui").style.display = "block";
-    document.getElementById("name-given-message").style.display = "inline";
+    document.getElementById("name-given-message").style.display = "block";
 
     // This is dumb, but required so that removeEventListener works correctly with bind()
     this.onAddShape = this.onAddShape.bind(this);
